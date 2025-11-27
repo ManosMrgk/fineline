@@ -105,7 +105,7 @@ CATEGORIES:Dict[int, str] = {
     15: "Documents",
     16: "Grooming",
     17: "Entertainment",
-    18: "Social Life",
+    18: "Social life",
     19: "Beauty",
     20: "Rent",
     21: "Money transfer",

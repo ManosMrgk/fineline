@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 const SERVICE_URL =
-  process.env.CATEGORIZER_BASE_URL || "http://localhost:8001/categorize";
+  process.env.CATEGORIZER_BASE_URL || "http://localhost:8001";
 const SERVICE_SECRET = process.env.CATEGORIZER_SECRET;
 
 export async function POST(req: Request) {
