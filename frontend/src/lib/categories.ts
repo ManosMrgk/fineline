@@ -25,6 +25,7 @@ string> = {
     22: "Salary", 
     23: "Tourism", 
     24: "Household",
+    25: "Other"
 };
 
 export const CATEGORY_VALUES = Object.values(CATEGORIES);
