@@ -1,0 +1,7 @@
+api/.env
+__pycache__/
+frontend/.gitignore
+preprocessing/.env
+preprocessing/finetuned-transaction-model/
+api/finetuned-transaction-model/
+preprocessing/sample_data/
