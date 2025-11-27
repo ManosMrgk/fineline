@@ -28,9 +28,17 @@ from utils import CATEGORIES, KNOWN_MERCHANT_CATEGORIES
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-MODEL_PATH = os.getenv("MODEL_PATH", "finetuned-transaction-model")
+
+MODEL_PATH = os.getenv(
+    "MODEL_PATH",
+    "ManosMrgk/bert_transaction_classifier",
+)
+
 MODEL_VERSION = os.getenv("MODEL_VERSION", MODEL_PATH)
 CATEGORIZER_SECRET = os.getenv("CATEGORIZER_SECRET")
+
+HF_TOKEN = os.getenv("HUGGING_FACE_TOKEN") or os.getenv("HF_TOKEN")
+
 FALLBACK_CATEGORY = None
 
 engine = None
@@ -61,8 +69,13 @@ else:
 app = FastAPI(title="Transaction Categorizer")
 
 print("[Model] Loading tokenizer & model from:", MODEL_PATH)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
+
+load_kwargs: Dict[str, str] = {}
+if HF_TOKEN:
+    load_kwargs["token"] = HF_TOKEN
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, **load_kwargs)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, **load_kwargs)
 model.eval()
 print("[Model] Loaded.")
 
@@ -228,19 +241,19 @@ def categorize(
 
     cached = get_cached_categories(normalized_texts)
 
-    missing_normals: list[str] = []        # unique normalized texts to classify
-    missing_originals: list[str] = []      # representative original text for each normalized
-    seen_missing_norms: set[str] = set()   # to avoid duplicates within the request
+    missing_normals: list[str] = []
+    missing_originals: list[str] = []
+    seen_missing_norms: set[str] = set()
 
     for original, norm in zip(texts, normalized_texts):
+        # Already in DB cache
         if norm in cached:
-          continue
+            continue
 
-        # Not cached, but we already queued this normalized text in this request
+        # Not cached, but already queued in this request
         if norm in seen_missing_norms:
-          continue
+            continue
 
-        # First time we see this normalized text in this request
         seen_missing_norms.add(norm)
         missing_normals.append(norm)
         missing_originals.append(original)
@@ -252,11 +265,11 @@ def categorize(
         # Cache in DB (one row per unique normalized text)
         cache_categories(missing_originals, missing_normals, newly_predicted)
 
-        # Update in-memory cache map
+        # Update in-memory cache
         for norm, cat in zip(missing_normals, newly_predicted):
             cached[norm] = cat
 
-    # Build final categories for the *original order* of texts
+    # Build final categories in original order
     final_categories: list[str] = []
     for norm in normalized_texts:
         cat = cached.get(norm, FALLBACK_CATEGORY)
