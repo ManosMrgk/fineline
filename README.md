@@ -1,7 +1,9 @@
 # Fineline – AI-Powered Personal Finance Dashboard
 
-Fineline is a personal finance dashboard that helps you understand, analyze and forecast your spending. It classifies bank transactions with a fine-tuned BERT model, forecasts monthly spending, and uses an LLM-powered assistant to provide natural-language insights and budgeting tips.
----
+## Visit here: [https://thefineline.vercel.app/](https://thefineline.vercel.app/)
+
+Fineline is a personal finance dashboard that helps you understand, analyze and forecast your spending. It classifies bank transactions with a fine-tuned BERT model hosted on HuggingFace, forecasts monthly spending, and uses an LLM-powered assistant to provide natural-language insights and budgeting tips.
+
 
 ### Dashboard and AI Assistant
 
